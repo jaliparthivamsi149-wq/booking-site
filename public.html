@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VenueFlow - Request a Booking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-container {
+                padding: 30px 20px;
+            }
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ VenueFlow</h1>
+            <p>Request your venue booking in seconds</p>
+        </div>
+
+        <div class="form-container">
+            <div id="message" class="message"></div>
+
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label for="customerName">Full Name <span class="required">*</span></label>
+                    <input type="text" id="customerName" required placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address <span class="required">*</span></label>
+                    <input type="email" id="email" required placeholder="your.email@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number <span class="required">*</span></label>
+                    <input type="tel" id="phone" required placeholder="+353 XX XXX XXXX">
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label for="eventDate">Event Date <span class="required">*</span></label>
+                        <input type="date" id="eventDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="eventType">Event Type <span class="required">*</span></label>
+                        <select id="eventType" required>
+                            <option value="">Select type</option>
+                            <option value="wedding">Wedding</option>
+                            <option value="corporate">Corporate Event</option>
+                            <option value="conference">Conference</option>
+                            <option value="party">Private Party</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label for="guests">Expected Guests <span class="required">*</span></label>
+                        <input type="number" id="guests" required min="1" placeholder="50">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="budget">Budget Range</label>
+                        <select id="budget">
+                            <option value="">Select range</option>
+                            <option value="0-2000">€0 - €2,000</option>
+                            <option value="2000-5000">€2,000 - €5,000</option>
+                            <option value="5000-10000">€5,000 - €10,000</option>
+                            <option value="10000+">€10,000+</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Additional Details</label>
+                    <textarea id="message" placeholder="Tell us more about your event requirements..."></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Submit Booking Request
+                </button>
+            </form>
+        </div>
+
+        <div class="footer">
+            © 2025 VenueFlow | Powered by Firebase
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase configuration - REPLACE WITH YOUR ACTUAL CONFIG
+        const firebaseConfig = {
+  apiKey: "AIzaSyCG3q9IR_mKI4u90q-rycrn24wRpLoe-8Q",
+  authDomain: "booking-request-approval.firebaseapp.com",
+  projectId: "booking-request-approval",
+  storageBucket: "booking-request-approval.firebasestorage.app",
+  messagingSenderId: "862342894454",
+  appId: "1:862342894454:web:d0c42fb93baa2f7d522057"
+};
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const form = document.getElementById('bookingForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const messageDiv = document.getElementById('message');
+
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('eventDate').setAttribute('min', today);
+
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type} show`;
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageDiv.classList.remove('show');
+                }, 5000);
+            }
+        }
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function validatePhone(phone) {
+            const cleaned = phone.replace(/\D/g, '');
+            return cleaned.length >= 7;
+        }
+
+        function getElementValue(id) {
+            const element = document.getElementById(id);
+            if (!element) {
+                console.error(`Element with id '${id}' not found`);
+                return '';
+            }
+            const value = element.value;
+            return value ? value.trim() : '';
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Get form values with safe handling
+            const customerName = getElementValue('customerName');
+            const email = getElementValue('email');
+            const phone = getElementValue('phone');
+            const eventDate = getElementValue('eventDate');
+            const eventType = getElementValue('eventType');
+            const guestsValue = getElementValue('guests');
+            const guests = guestsValue ? parseInt(guestsValue) : 0;
+            const budget = getElementValue('budget');
+            const message = getElementValue('message');
+
+            // Validation
+            if (!customerName || customerName.length < 2) {
+                showMessage('Please enter a valid full name.', 'error');
+                return;
+            }
+
+            if (!validateEmail(email)) {
+                showMessage('Please enter a valid email address.', 'error');
+                return;
+            }
+
+            if (!validatePhone(phone)) {
+                showMessage('Please enter a valid phone number.', 'error');
+                return;
+            }
+
+            if (!eventDate) {
+                showMessage('Please select an event date.', 'error');
+                return;
+            }
+
+            if (!eventType) {
+                showMessage('Please select an event type.', 'error');
+                return;
+            }
+
+            if (!guests || guests < 1) {
+                showMessage('Please enter a valid number of guests.', 'error');
+                return;
+            }
+
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span>Submitting...';
+
+            try {
+                // Add document to Firestore
+                const docRef = await addDoc(collection(db, 'bookingRequests'), {
+                    customerName: customerName,
+                    email: email,
+                    phone: phone,
+                    eventDate: eventDate,
+                    eventType: eventType,
+                    guests: guests,
+                    budget: budget || 'Not specified',
+                    message: message || 'No additional details provided',
+                    status: 'pending',
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                });
+
+                console.log('Booking created with ID:', docRef.id);
+
+                // Show success message
+                showMessage('✅ Booking request submitted successfully! Our team will review your request and contact you soon.', 'success');
+
+                // Reset form
+                form.reset();
+
+            } catch (error) {
+                console.error('Error adding document:', error);
+                showMessage(`Error submitting booking: ${error.message}. Please check your Firebase configuration.`, 'error');
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Submit Booking Request';
+            }
+        });
+    </script>
+</body>
+</html>
